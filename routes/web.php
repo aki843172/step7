@@ -35,7 +35,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/product', [ProductController::class, 'index'])->name('product');
     Route::get('/products/search', [ProductController::class, 'search'])->name('products.search');
 
-
+    Route::post('/products', [ProductController::class, 'store'])->name('products.store');
     Route::resource('products', ProductController::class);
     
 });

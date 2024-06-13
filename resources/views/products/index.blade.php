@@ -1,16 +1,10 @@
 @extends('layouts.app')
 
 @section('content')
+
+
 <div class="container">
     <h1>商品一覧画面</h1>
-
-    <form action="/products" method="get">
-        <input type="text" name="name" placeholder="商品名">
-        <select name="maker">
-        <!-- メーカーの一覧をoptionタグで表示 -->
-        </select>
-        <button type="submit">検索</button>
-    </form>
 
     <form action="{{ route('products.index') }}" method="GET">
         <input type="text" name="product_name" placeholder="商品名" value="{{ request('product_name') }}">
@@ -22,32 +16,40 @@
                 </option>
             @endforeach
         </select>
+        
         <button type="submit">検索</button>
     </form>
+   
 
     
     <table class="table">
         <thead>
             <tr>
-                
+
                 <th>ID</th>
-                
                 <th>商品名</th>
                 <th>価格</th>
                 <th>在庫数</th>        
                 <th>メーカー名</th>
-
+                
             </tr>
         </thead>
+                <a href="{{ route('products.create') }}" class="btn btn-success" style="margin-top: 20px;">新規登録</a>
         <tbody>
             @foreach ($products as $product)
             <tr>
                 <td>{{ $product->id }}</td>
-                <td>{{ $product->name }}</td>
+                <td>{{ $product->product_name }}</td>
                 <td>{{ $product->price }}</td> 
                 <td>{{ $product->stock }}</td>
-                <td>{{ $product->manufacturer->name}}</td>
+                <td>{{ optional($product->company)->name }}</td>             
                 <td>
+                <td>
+                    <a href="{{ route('products.show', $product->id) }}" class="btn btn-primary">詳細</a>
+                </td>
+                
+                <td>
+
                     <form action="{{ route('products.destroy', $product->id) }}" method="POST">
                         @csrf
                         @method('DELETE')
@@ -60,15 +62,8 @@
         </tbody>
     </table>
 
-    @foreach($products as $product)
-        <div>
-            <div>{{ $product->id }}</div>
-            <div>{{ $product->name }}</div>
-            <div>{{ $product->price }}</div>
-            <div>{{ $product->stock }}</div>
-            <div>{{ $product->company->name }}</div>
-            {{-- 詳細表示ボタン、削除ボタン等 --}}
-        </div>
-        @endforeach
+    
+       
+       
 </div>
 @endsection
