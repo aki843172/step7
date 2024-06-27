@@ -32,7 +32,7 @@ Route::post('/register', [RegisterController::class, 'register']); // ユーザ�
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/home', [ProductController::class, 'index'])->name('home');
-    Route::get('/product', [ProductController::class, 'index'])->name('product');
+    Route::get('/products', [ProductController::class, 'index'])->name('products');
     Route::get('/products/search', [ProductController::class, 'search'])->name('products.search');
 
     Route::post('/products', [ProductController::class, 'store'])->name('products.store');

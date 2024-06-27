@@ -13,9 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('articles_products', function (Blueprint $table) {
+        Schema::create('products', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('company_id');
+            $table->integer('company_id');
             $table->string('product_name');
             $table->integer('price');
             $table->integer('stock');
@@ -24,7 +24,7 @@ return new class extends Migration
             $table->unsignedBigInteger('updated_by')->nullable();
             $table->timestamps();
 
-            $table->foreign('company_id')->references('id')->on('companies');
+          
     
 
         });
@@ -37,6 +37,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('articles_products');
+        Schema::dropIfExists('products');
     }
 };

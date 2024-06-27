@@ -6,28 +6,33 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Company;
 
-
 class ProductController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        $companies = Company::all(); // すべての会社データを取得
-        $products = Product::with('company')->get(); // すべての商品データを取得（リレーション込み）
-        
-        return view('products.index', compact('companies', 'products'));
-        
-    }
-
+        /**
+        * Display a listing of the resource.
+        *
+        * @param  \Illuminate\Http\Request  $request
+        * @return \Illuminate\Http\Response
+        */
+        public function index(Request $request)
+        {
+            $companies = Company::all();
+            $query = Product::query();
     
-   
-
-
-
+            if ($request->has('keyword')) {
+                $keyword = $request->input('keyword');
+                $query->where('product_name', 'like', '%' . $keyword . '%');
+            }
+    
+            if ($request->has('company_id') && $request->input('company_id') != '') {
+                $company_id = $request->input('company_id');
+                $query->where('company_id', $company_id);
+            }
+    
+            $products = $query->with('company')->get();
+    
+            return view('products.index', compact('companies', 'products'));
+        }
 
     /**
     * Show the form for creating a new resource.
@@ -37,7 +42,7 @@ class ProductController extends Controller
     public function create()
     {
        
-        $companies = Company::all(); // すべての会社データを取得
+        $companies = Company::select('company_name')->get();
         return view('products.create', compact('companies'));
     }
 
@@ -53,40 +58,36 @@ class ProductController extends Controller
     {
         // バリデーション
         $request->validate([
-            'name' => 'required',
+            'product_name' => 'required',
             'price' => 'required|numeric',
-            'manufacturer' => 'required',
+            'company_id' =>  'required',
             'stock' => 'required|integer',
             'comment' => 'nullable',
-            'image' => 'required|image'
+            'img_path' => 'nullable|image'
         ]);
 
         
         // 画像の保存
-        if ($request->hasFile('image')) {
-            $filename = $request->image->store('public/images');
+        $filename = null;
+        if ($request->hasFile('img_path')) {
+            $filename = $request->img_path->store('public/images');
         }
 
 
         // 商品情報の保存
         $product = new Product;
-        $product->name = $request->name;
+        $product->product_name = $request->product_name;
         $product->price = $request->price;
-        $product->company_name = $request->company_name;
+        $product->company_id = $request->company_id;
         $product->stock = $request->stock;
         $product->comment = $request->comment;
-        $product->image = $filename;
+        $product->img_path = $filename;
         $product->save();
         
 
         // 登録完了後、自画面にリダイレクト
         return redirect()->route('products.create')->with('success', '商品が登録されました。');
-        //新規商品情報をデータベースに保存するためのメソッド
-        //通常、これはフォームから送信されたデータを取得し、それをデータベースに保存する
-        //これは、商品を登録した後に再び商品登録フォームのページへリダイレクトし、さらに success という名前で成功メッセージを
-        //セッションにフラッシュ（一時的に保存）します。
-        //これにより、ユーザーは同じフォームで複数の商品を連続して登録することが可能になり、
-        //登録が成功したことを知らせるメッセージも表示されます。
+       
     }
 
     /**
@@ -112,7 +113,9 @@ class ProductController extends Controller
     public function edit($id)
     {
         $product = Product::find($id);
-        return view('products.edit', compact('product'));
+        $companies = Company::all();
+
+        return view('products.edit', compact('product','companies'));
         // 商品情報編集画面を表示するためのメソッド
         //通常、これはデータベースから特定の商品情報を取得し、それを編集フォームに渡して表示します。
 
@@ -128,34 +131,30 @@ class ProductController extends Controller
     public function update(Request $request, $id)
     {
         // バリデーションの追加（必要に応じて）
-        $request->validate([
-            'name' => 'required',
-            'price' => 'required|numeric',
-            'manufacturer' => 'required',
-            'stock' => 'required|integer',
-            'comment' => 'nullable',
-            'image' => 'nullable|image'
+        $validatedData = $request->validate([
+           'product_name' => 'required|max:255',
+        'company_id' => 'required',
+        'price' => 'required|numeric',
+        'stock' => 'required|numeric',
+        'comment' => 'nullable|string',
+        'img_path' => 'nullable|image|max:2048',
         ]);
 
-        $product = Product::find($id);
+        $product = Product::findOrFail($id);
+        $product->product_name = $validatedData['product_name'];
+        $product->company_id = $validatedData['company_id'];
+        $product->price = $validatedData['price'];
+        $product->stock = $validatedData['stock'];
+        $product->comment = $validatedData['comment'];
 
-        // 商品情報の更新
-        $product->name = $request->name;
-        $product->price = $request->price;
-        $product->manufacturer = $request->manufacturer;
-        $product->stock = $request->stock;
-        $product->comment = $request->comment;
-
-    // 画像の更新（必要に応じて）
-        if ($request->hasFile('image')) {
-            $filename = $request->image->store('public/images');
-            $product->image = $filename;
+        if ($request->hasFile('img_path')) {
+            $path = $request->file('img_path')->store('public/images');
+            $product->img_path = str_replace('public/', 'storage/', $path);
         }
 
         $product->save();
-        return redirect()->route('products.show',['id' => $id])->with('success', '商品情報が更新されました。');
-        //編集された商品情報をデータベースに保存するためのメソッドです。
-        //通常、これはフォームから送信されたデータを取得し、それをデータベースに保存します。
+
+        return redirect()->route('products.show', $product->id)->with('success', '商品情報が更新されました。');
     }
 
     /**

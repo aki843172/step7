@@ -5,73 +5,76 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>商品新規登録</title>
     <link rel="stylesheet" href="../css/app.css">
+    <style>
+        
+       
 
-<style>
-.registration-form {
-  border: 1px solid black;
-  padding: 50px;
-  margin-bottom: 50px;
-  width: fit-content; /* フォームのコンテンツに合わせた幅にする */
-}
-.form-row {
-  display: flex;
-  align-items: center;
-  margin-bottom: 15px;
-  height: 50px; /* 高さを指定 */
+        body {
+            font-size: 20px; /* 文字全体を少し大きくする */
+            display: flex;
+            flex-direction: column; /* 縦方向に並べる */
+            justify-content: center;
+            align-items: center;
+            height: 100vh; /* ビューポートの高さを100%に設定 */
+            
+        }
+        .registration-form {
+            border: 1px solid black; /* 黒枠を設定 */
+            margin: 0 auto; /* フォームを中央に配置 */
+            padding: 50px; /* 内側の余白を設定 */
+            margin-bottom: 60px; /* 下部の余白を設定 */
+            width: 100%; /* フォームの幅を100%に設定 */
+            max-width: 600px; /* 最大幅を設定 */
+        }
 
+        .form-row {
+            display: flex;
+            margin-bottom: 30px; /* 行間隔 */
+        }
 
-}
-.form-row label {
-  width: 150px; /* ラベルの幅を揃える */
-  margin-right: 25px;
-  height: 40px; /* 高さを指定 */
-  
-}
+        .form-row label {
+            width: 120px; /* ラベルの幅を揃える */
+            margin-right: 15px;
+        }
 
-input {
-  border: 1px solid black;
-  padding: 15px; /* 内側の余白（パディング）を全方向に10px設定 */
-  padding-right: 25px; 
-  border-radius: 3px; /* 角を5ピクセル丸くする */
-}
+        .form-row input  {
+            align-items: left;
+        }
 
-.form-control {
-  display: block; /* ブロックレベル要素として表示 */
-  width: 100%; /* 親要素の幅に合わせて広がる */
-  padding: 8px; /* 内側の余白 */
-  border: 1px solid black; /* 境界線 */
-  border-radius: 3px; /* 角の丸み */
-  margin-bottom: 40px; /* 下側の余白 */
- /
-}
+        .form-row input,
+        .form-row select,
+        .form-row textarea {
+            width: 70%; /* 入力欄の幅を100%に設定 */
+            padding: 10px; /* 内側の余白を設定 */
+            font-size: 16px; /* フォントサイズを設定 */
+        }
 
+        .register-button {
+            border: 1px solid black;
+            background-color: orange; /* 登録ボタンはオレンジ色 */
+            padding: 4px 8px;
+            border-radius: 5px; /* 角を丸くする */
+            margin-right: 40px; /* 右側に余白を追加 */
+        }
 
+        .back-button {
+            border: 1px solid black;
+            background-color: skyblue; /* 戻るボタンはライトブルー */
+            padding: 4px 8px;
+            border-radius: 5px; /* 角を丸くする */
+        }
 
-.register-button {
-  border: 1px solid black;
-  background-color: orange; /* 登録ボタンはオレンジ色 */
-  padding: 7px 10px;
-  border-radius: 5px; /* 角を丸くする */
-  margin-right: 40px; /* 右側に余白を追加 */
-}
+        .register-button:hover, .back-button:hover {
+            opacity: 0.8; /* ホバー時に透明度を下げる */
+        }
 
-.back-button {
-  border: 1px solid black;
-  background-color: lightblue; /* 戻るボタンはライトブルー */
-  padding: 7px 10px;
-  border-radius: 5px; /* 角を丸くする */
-}
+    </style>
 
-
-.register-button:hover, .back-button:hover {
-  opacity: 0.8; /* ホバー時に透明度を下げる */
-}
-
-  
-</style>
+ 
 </head>
 <body>
-    <h1>商品新規登録画面</h1>
+    
+    <h2>商品新規登録画面</h2>
 
     @if (session('success'))
         <div style="color: green;">
@@ -95,14 +98,18 @@ input {
         <div class="registration-form">
 
             <div class="form-row">
-                {{ Form::label('name', '商品名 <span style="color:red;">*</span>', ['class' => 'control-label'], false) }}
-                {{ Form::text('name', null, ['class' => 'form-control', 'required']) }}
+                {{ Form::label('product_name', '商品名 <span style="color:red;">*</span>', ['class' => 'control-label'], false) }}
+                {{ Form::text('product_name', null, ['class' => 'form-control', 'required']) }}
             </div>
 
-            <!-- メーカーのセレクトボックス -->
             <div class="form-row">
-                {{ Form::label('manufacturer', 'メーカー名 <span style="color:red;">*</span>', ['class' => 'control-label'], false) }}
-                {{ Form::select('manufacturer', ['メーカーA' => 'メーカーA', 'メーカーB' => 'メーカーB', 'メーカーC' => 'メーカーC'], null, ['class' => 'form-control', 'required']) }}
+                {{ Form::label('company_id', 'メーカ名 <span style="color:red;">*</span>', ['class' => 'control-label'], false) }}
+                <select id="company_id" name="company_id" class="form-control" required>
+                    <option value="">メーカー名を選択</option>
+                    @foreach($companies as $company)
+                    <option value="{{ $company->company_name}}">{{ $company->company_name }}</option>
+                    @endforeach
+                </select>
             </div>
 
             <div class="form-row">
@@ -127,9 +134,11 @@ input {
 
             <div class="form-row">
                 <button type="submit" class="register-button">新規登録</button>
-                <button type="button" onclick="window.history.back()"class="back-button">戻る</button>
+                <button type="button" onclick="window.location='{{ route('products.index') }}'" class="back-button">戻る</button>
+
             </div>
         </div>
     </form>
+     
 </body>
 </html>
