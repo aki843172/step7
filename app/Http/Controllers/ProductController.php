@@ -49,26 +49,7 @@ class ProductController extends Controller
          return str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $value);
      }
  
-            //$companies = Company::all();
-            //$query = Product::query();
-    
-            //if ($request->has('keyword')) {
-                //$keyword = $request->input('keyword');
-                //$query->where('product_name', 'like', '%' . $keyword . '%');
-            //}
-    
-            //if ($request->has('company_id') && $request->input('company_id') != '') {
-                //$company_id = $request->input('company_id');
-                //$query->where('company_id', $company_id);
-            //}
-    
-             // leftJoinを使ってcompanyの情報を取得
-            //$products = $query->leftJoin('companies', 'products.company_id', '=', 'companies.id')
-            //->select('products.*', 'companies.company_name')
-            //->get();
-    
-            //return view('products.index', compact('companies', 'products'));
-        
+            
 
     /**
     * Show the form for creating a new resource.
@@ -78,7 +59,7 @@ class ProductController extends Controller
     public function create()
     {
        
-        $companies = Company::select('company_name')->get();
+        $companies = Company::select('id','company_name')->get();
         return view('products.create', compact('companies'));
     }
 
@@ -168,8 +149,8 @@ class ProductController extends Controller
     {
         // バリデーションの追加（必要に応じて）
         $validatedData = $request->validate([
-           'product_name' => 'required|max:255',
-        'company_id' => 'required',
+        'product_name' => 'required|max:255',
+        'company_id' => 'required|integer',
         'price' => 'required|numeric',
         'stock' => 'required|numeric',
         'comment' => 'nullable|string',
