@@ -96,21 +96,19 @@
   
         <form action="{{ route('products.index') }}" method="GET">
 
-            <input type="text" name="keyword" placeholder="検索キーワード" value="{{ request('keyword') }}"class="search-input">
+            <input type="text" name="keyword" placeholder="検索キーワード" value="{{ request('keyword') }}" class="search-input">
 
-            <select name="company_id"class="select-box">
+            <select name="company_id" class="select-box">
                 <option value="">メーカー名</option>
-                @foreach($companies as $company)
-                <option value="{{ $company->id }}" {{ request('company_id') == $company->id ? 'selected' : '' }}>
-                {{ $company->company_name }}
+                @foreach($companies as $id => $company_name)
+                <option value="{{ $id }}" {{ request('company_id') == $id ? 'selected' : '' }}>
+                {{ $company_name }}
                 </option>
                 @endforeach
             </select>
 
-            <button type="submit" class ="searct-button">検索</button>
-        </form>
-  
-
+<button type="submit" class="search-button">検索</button>
+</form>
         
     <table class="table">
         <thead>
@@ -137,7 +135,7 @@
                 <td><img src="{{ $product->img_path }}" alt="{{ $product->product_name }}"></td>
                 <td>{{ $product->price }}</td> 
                 <td>{{ $product->stock }}</td>
-                <td>{{ $product->company_id }}</td>             
+                <td>{{ $product->company->company_name }}</td>             
                 
                 <td>
                     <a href="{{ route('products.show', $product->id) }}" class="detail-button">詳細</a>
@@ -156,9 +154,9 @@
             @endforeach
         </tbody>
     </table>
-
-    
-       
-       
+    {{ $products->links() }}
     </div>
 @endsection
+    
+       
+  

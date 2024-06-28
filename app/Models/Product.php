@@ -15,7 +15,7 @@ class Product extends Model
 
    protected $table = 'products';
 
-    public function company()
+    public function company() //productsはcompaniesに属する
     {
         return $this->belongsTo(Company::class,'company_id');
     }

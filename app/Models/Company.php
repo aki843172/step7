@@ -15,6 +15,16 @@ class Company extends Model
 
      protected $keyType = 'string'; // プライマリキーのデータ型が文字列の場合、これを設定
 
+
+     public function getLists()
+     {
+         $companies =Company::pluck('company_name', 'id');
+ 
+         //return $companies;
+     }
+
+
+    
     public function products()
     {
         return $this->hasMany(Product::class);

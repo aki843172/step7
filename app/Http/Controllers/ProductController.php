@@ -16,23 +16,59 @@ class ProductController extends Controller
         */
         public function index(Request $request)
         {
-            $companies = Company::all();
-            $query = Product::query();
-    
-            if ($request->has('keyword')) {
+
+             //入力される値nameの中身を定義する
+        $keyWord = $request->input('keyWord'); //商品名の値
+        $company_id = $request->input('company_id'); //カテゴリの値
+
+        $query = Product::query();
+        //商品名が入力された場合、productsテーブルから一致する商品を$queryに代入
+        if ($request->has('keyword')) {
                 $keyword = $request->input('keyword');
                 $query->where('product_name', 'like', '%' . $keyword . '%');
             }
-    
-            if ($request->has('company_id') && $request->input('company_id') != '') {
-                $company_id = $request->input('company_id');
-                $query->where('company_id', $company_id);
-            }
-    
-            $products = $query->with('company')->get();
-    
-            return view('products.index', compact('companies', 'products'));
+        //カテゴリが選択された場合、m_categoriesテーブルからcategory_idが一致する商品を$queryに代入
+        if (isset($company_id)) {
+            $query->where('company_id', $company_id);
         }
+
+        //$queryをcategory_idの昇順に並び替えて$productsに代入
+        $products = $query->with('company')->orderBy('company_id', 'asc')->paginate(15);
+
+        //m_categoriesテーブルからgetLists();関数でcategory_nameとidを取得する
+        $company = new Company;
+        $companies = Company::pluck('company_name', 'id')->toArray();
+
+        return view('products.index', compact('companies', 'products'));
+         
+    }
+
+     // escapeLike関数の定義
+     protected static function escapeLike($value)
+     {
+         return str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $value);
+     }
+ 
+            //$companies = Company::all();
+            //$query = Product::query();
+    
+            //if ($request->has('keyword')) {
+                //$keyword = $request->input('keyword');
+                //$query->where('product_name', 'like', '%' . $keyword . '%');
+            //}
+    
+            //if ($request->has('company_id') && $request->input('company_id') != '') {
+                //$company_id = $request->input('company_id');
+                //$query->where('company_id', $company_id);
+            //}
+    
+             // leftJoinを使ってcompanyの情報を取得
+            //$products = $query->leftJoin('companies', 'products.company_id', '=', 'companies.id')
+            //->select('products.*', 'companies.company_name')
+            //->get();
+    
+            //return view('products.index', compact('companies', 'products'));
+        
 
     /**
     * Show the form for creating a new resource.
