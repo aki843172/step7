@@ -18,25 +18,24 @@ class ProductController extends Controller
         {
 
              //入力される値nameの中身を定義する
-        $keyWord = $request->input('keyWord'); //商品名の値
-        $company_id = $request->input('company_id'); //カテゴリの値
+        $keyword = $request->input('keyword'); //商品名の値
+        $company_id = $request->input('company_id'); //会社名の値
 
         $query = Product::query();
         //商品名が入力された場合、productsテーブルから一致する商品を$queryに代入
         if ($request->has('keyword')) {
-                $keyword = $request->input('keyword');
-                $query->where('product_name', 'like', '%' . $keyword . '%');
+            $query->where('product_name', 'like', '%' . $keyword . '%');
             }
-        //カテゴリが選択された場合、m_categoriesテーブルからcategory_idが一致する商品を$queryに代入
+        //カテゴリが選択された場合、companiesテーブルからcompany_idが一致する商品を$queryに代入
         if (isset($company_id)) {
             $query->where('company_id', $company_id);
         }
 
-        //$queryをcategory_idの昇順に並び替えて$productsに代入
-        $products = $query->with('company')->orderBy('company_id', 'asc')->paginate(15);
+        //$queryをidの昇順に並び替えて$productsに代入
+        $products = $query->with('company')->orderBy('id', 'asc')->paginate(10);
 
-        //m_categoriesテーブルからgetLists();関数でcategory_nameとidを取得する
-        $company = new Company;
+        //companiesテーブルからgetLists();関数でcompany_nameとidを取得する
+        
         $companies = Company::pluck('company_name', 'id')->toArray();
 
         return view('products.index', compact('companies', 'products'));
@@ -44,10 +43,10 @@ class ProductController extends Controller
     }
 
      // escapeLike関数の定義
-     protected static function escapeLike($value)
-     {
-         return str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $value);
-     }
+     //protected static function escapeLike($value)
+     //{
+        // return str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $value);
+     //}
  
             
 

@@ -58,7 +58,7 @@
         <h1>商品情報編集画面</h1>
 
         @if(session('success'))
-            <div class="alert alert-success">
+            <div style="color: green;">
                 {{ session('success') }}
             </div>
         @endif
