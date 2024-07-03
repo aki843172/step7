@@ -19,36 +19,27 @@ class ProductController extends Controller
         public function index(Request $request)
         {
 
-             //入力される値nameの中身を定義する
         $keyword = $request->input('keyword'); //商品名の値
         $company_id = $request->input('company_id'); //会社名の値
 
         $query = Product::query();
-        //商品名が入力された場合、productsテーブルから一致する商品を$queryに代入
+       
         if ($request->has('keyword')) {
             $query->where('product_name', 'like', '%' . $keyword . '%');
             }
-        //カテゴリが選択された場合、companiesテーブルからcompany_idが一致する商品を$queryに代入
+       
         if (isset($company_id)) {
             $query->where('company_id', $company_id);
         }
 
-        //$queryをidの昇順に並び替えて$productsに代入
+        
         $products = $query->with('company')->orderBy('id', 'asc')->paginate(10);
 
-        //companiesテーブルからgetLists();関数でcompany_nameとidを取得する
-        
         $companies = Company::pluck('company_name', 'id')->toArray();
 
         return view('products.index', compact('companies', 'products'));
          
     }
-
-     // escapeLike関数の定義
-     //protected static function escapeLike($value)
-     //{
-        // return str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $value);
-     //}
  
             
 
@@ -77,7 +68,10 @@ class ProductController extends Controller
         try {
             $filename = null;
             if ($request->hasFile('img_path')) {
-                $filename = $request->img_path->store('public/images');
+                $file = $request->file('img_path');
+                $filename = time() . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('images'), $filename);
+                
             }
 
             $product = new Product;
@@ -86,7 +80,7 @@ class ProductController extends Controller
             $product->company_id = $request->company_id;
             $product->stock = $request->stock;
             $product->comment = $request->comment;
-            $product->img_path = $filename;
+            $product->img_path = $filename ? 'images/' . $filename : null;
             $product->save();
 
             return redirect()->route('products.create')->with('success', '商品が登録されました。');
@@ -104,8 +98,7 @@ class ProductController extends Controller
     {
         $product = Product::find($id);
         return view('products.show', compact('product'));
-        // 商品情報詳細画面を表示するためのメソッドです。
-        //通常、これはデータベースから特定の商品情報を取得し、それをビューに渡して表示します。
+        
     }
 
     /**
@@ -120,9 +113,7 @@ class ProductController extends Controller
         $companies = Company::all();
 
         return view('products.edit', compact('product','companies'));
-        // 商品情報編集画面を表示するためのメソッド
-        //通常、これはデータベースから特定の商品情報を取得し、それを編集フォームに渡して表示します。
-
+        
     }
 
     /**
@@ -137,15 +128,19 @@ class ProductController extends Controller
 
         try {
             $product = Product::findOrFail($id);
-            $product->product_name = $validatedData['product_name'];
-            $product->company_id = $validatedData['company_id'];
-            $product->price = $validatedData['price'];
-            $product->stock = $validatedData['stock'];
-            $product->comment = $validatedData['comment'];
+            $product->product_name = $request['product_name'];
+            $product->company_id = $request['company_id'];
+            $product->price = $request['price'];
+            $product->stock = $request['stock'];
+            $product->comment = $request['comment'];
 
             if ($request->hasFile('img_path')) {
-                $path = $request->file('img_path')->store('public/images');
-                $product->img_path = str_replace('public/', 'storage/', $path);
+                $file = $request->file('img_path');
+                $filename = time() . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('images'), $filename);
+                $product->img_path = 'images/' . $filename;
+            
+            
             }
 
             $product->save();

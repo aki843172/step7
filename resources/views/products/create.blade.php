@@ -128,8 +128,8 @@
             </div>
 
             <div class="form-row">
-                <label for="image">商品画像</label>
-                <input type="file" id="image" name="image">
+                <label for="img_path">商品画像</label>
+                <input type="file" id="img_path" name="img_path">
             </div>
 
             <div class="form-row">
