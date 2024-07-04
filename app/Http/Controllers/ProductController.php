@@ -125,7 +125,7 @@ class ProductController extends Controller
      */
     public function update(ArticleRequest $request, $id)
     {
-
+        
         try {
             $product = Product::findOrFail($id);
             $product->product_name = $request['product_name'];
@@ -134,13 +134,37 @@ class ProductController extends Controller
             $product->stock = $request['stock'];
             $product->comment = $request['comment'];
 
+            //if ($request->hasFile('img_path')) {
+                //$file = $request->file('img_path');
+                //$filename = time() . '.' . $file->getClientOriginalExtension();
+                //$file->move(public_path('images'), $filename);
+                //$product->img_path = 'images/' . $filename;
+            
+            if ($request->has('delete_img') && $product->img_path) {
+                $img_path = public_path($product->img_path);
+                if (file_exists($img_path)) {
+                    unlink($img_path);
+                }
+                $product->img_path = null;
+            }
+        
+            // 新しい画像のアップロード
             if ($request->hasFile('img_path')) {
                 $file = $request->file('img_path');
                 $filename = time() . '.' . $file->getClientOriginalExtension();
                 $file->move(public_path('images'), $filename);
+        
+                // 古い画像を削除
+                if ($product->img_path) {
+                    $old_img_path = public_path($product->img_path);                        
+                    if (file_exists($old_img_path)) {
+                        unlink($old_img_path);
+                    }
+                }
+        
                 $product->img_path = 'images/' . $filename;
             
-            
+        
             }
 
             $product->save();

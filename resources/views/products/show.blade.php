@@ -3,6 +3,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商品情報詳細</title>
+    
     <style>
         .container {
             font-size: 20px; /* 文字全体を少し大きくする */
@@ -70,19 +75,19 @@
         <div class="show-body">
 
             <div class="show-row">
-                <strong>ID</strong> <span>{{ $product->id }}</span>
+                <strong>ID</strong> <span>{{ $product->id }}.</span>
             </div>
-            <div class="show-row">
-                <strong>画像パス</strong> <span><img src="{{ $product->img_path }}" alt="{{ $product->product_name }}"></span>
+            <div class="show-row"> 
+                <strong>画像パス</strong> <span><img src="{{ asset($product->img_path) }}" alt="{{ $product->product_name }}" style="max-width: 200px;"></span>
             </div>
             <div class="show-row">
                 <strong>商品名</strong> <span>{{ $product->product_name }}</span>
             </div>
             <div class="show-row">
-                <strong>メーカー名</strong> <span>{{ $product->company_id }}</span>
+                <strong>メーカー名</strong> <span>{{ $product->company->company_name }}</span>
             </div>
             <div class="show-row">
-                <strong>価格</strong> <span>{{ $product->price }}</span>
+                <strong>価格</strong> <span>￥{{ $product->price }}</span>
             </div>
             <div class="show-row">
                 <strong>在庫数</strong> <span>{{ $product->stock }}</span>

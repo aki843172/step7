@@ -2,6 +2,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商品情報編集画面</title>
+    
     <style>
         .container {
            
@@ -25,14 +30,13 @@
             
         }
         .form-group label {
-            width: 100px; /* ラベルの幅を揃える */
+            width: 120px; /* ラベルの幅を揃える */
             margin-right: 30px;
            
         }
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: calc(90% - 120px); /* 入力欄の幅をラベルと合わせて調整 */
+        
+        .form-control{
+            width: calc(80% - 100px); /* 入力欄の幅をラベルと合わせて調整 */
             padding: 10px; /* 内側の余白を設定 */
             font-size: 16px; /* フォントサイズを設定 */
             
@@ -44,7 +48,7 @@
             border-radius: 5px; /* 角を丸くする */
             margin-right: 10px; /* 右側に余白を追加 */
         }
-        .back-button{
+        .return-button{
             border: 1px solid black;
             background-color: skyblue; /* 戻るボタンはライトブルー */
             padding: 4px 4px;
@@ -74,7 +78,7 @@
         @endif
             
             <div class="form-group">
-            <label for="id">ID </label> <span>{{ $product->id }}</span>
+            <label for="id">ID </label> <span>{{ $product->id }}.</span>
             </div>
             <div class="form-group">
                 <label for="product_name">商品名 <span style="color:red;">*</span> </label>
@@ -110,12 +114,18 @@
 
             <div class="form-group">
                 <label for="img_path">商品画像</label>
+                @if($product->img_path)
+                    <div>
+                        <img src="{{ asset($product->img_path) }}" alt="商品画像" style="max-width: 200px;">
+                        <input type="checkbox" name="delete_img" value="1"> 画像を削除
+                    </div>
+                @endif
                 <input type="file" id="img_path" name="img_path">
             </div>
 
             <div class="form-group">
             <button type="submit" class="update-button">更新</button>
-            <a href="{{ route('products.show', $product->id) }}" class="back-button">戻る</a>
+            <a href="{{ route('products.show', $product->id) }}" ><button type="button" class="return-button">戻る</a>
             </div>
         
         </div>
