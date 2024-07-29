@@ -1,79 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>商品新規登録</title>
-  
-    <style>
-        
-       
+@extends('layouts.app')
 
-        body {
-            font-size: 20px; /* 文字全体を少し大きくする */
-            display: flex;
-            flex-direction: column; /* 縦方向に並べる */
-            justify-content: center;
-            align-items: center;
-            height: 100vh; /* ビューポートの高さを100%に設定 */
-            
-        }
-        .registration-form {
-            border: 1px solid black; /* 黒枠を設定 */
-            margin: 0 auto; /* フォームを中央に配置 */
-            padding: 50px; /* 内側の余白を設定 */
-            margin-bottom: 60px; /* 下部の余白を設定 */
-            width: 100%; /* フォームの幅を100%に設定 */
-            max-width: 600px; /* 最大幅を設定 */
-        }
-
-        .form-row {
-            display: flex;
-            margin-bottom: 30px; /* 行間隔 */
-        }
-
-        .form-row label {
-            width: 120px; /* ラベルの幅を揃える */
-            margin-right: 15px;
-        }
-
-        .form-row input  {
-            align-items: left;
-        }
-
-        .form-row input,
-        .form-row select,
-        .form-row textarea {
-            width: 70%; /* 入力欄の幅を100%に設定 */
-            padding: 10px; /* 内側の余白を設定 */
-            font-size: 16px; /* フォントサイズを設定 */
-        }
-
-        .register-button {
-            border: 1px solid black;
-            background-color: orange; /* 登録ボタンはオレンジ色 */
-            padding: 4px 8px;
-            border-radius: 5px; /* 角を丸くする */
-            margin-right: 40px; /* 右側に余白を追加 */
-        }
-
-        .back-button {
-            border: 1px solid black;
-            background-color: skyblue; /* 戻るボタンはライトブルー */
-            padding: 4px 8px;
-            border-radius: 5px; /* 角を丸くする */
-        }
-
-        .register-button:hover, .back-button:hover {
-            opacity: 0.8; /* ホバー時に透明度を下げる */
-        }
-
-    </style>
-
- 
-</head>
-<body>
+@section('content')
     
+
+<div class="container">
     <h2>商品新規登録画面</h2>
 
     @if (session('success'))
@@ -139,6 +69,71 @@
             </div>
         </div>
     </form>
-     
-</body>
-</html>
+</div>
+
+@endsection
+
+        
+@push('styles')      
+<style>
+        body {
+            font-size: 20px; /* 文字全体を少し大きくする */
+            display: flex;
+            flex-direction: column; /* 縦方向に並べる */
+            justify-content: center;
+            align-items: center;
+            height: 100vh; /* ビューポートの高さを100%に設定 */
+            
+        }
+        .registration-form {
+            border: 1px solid black; /* 黒枠を設定 */
+            margin: 0 auto; /* フォームを中央に配置 */
+            padding: 50px; /* 内側の余白を設定 */
+            margin-bottom: 60px; /* 下部の余白を設定 */
+            width: 100%; /* フォームの幅を100%に設定 */
+            max-width: 600px; /* 最大幅を設定 */
+        }
+
+        .form-row {
+            display: flex;
+            margin-bottom: 30px; /* 行間隔 */
+        }
+
+        .form-row label {
+            width: 120px; /* ラベルの幅を揃える */
+            margin-right: 15px;
+        }
+
+        .form-row input  {
+            align-items: left;
+        }
+
+        .form-row input,
+        .form-row select,
+        .form-row textarea {
+            width: 70%; /* 入力欄の幅を100%に設定 */
+            padding: 10px; /* 内側の余白を設定 */
+            font-size: 16px; /* フォントサイズを設定 */
+        }
+
+        .register-button {
+            border: 1px solid black;
+            background-color: orange; /* 登録ボタンはオレンジ色 */
+            padding: 4px 8px;
+            border-radius: 5px; /* 角を丸くする */
+            margin-right: 40px; /* 右側に余白を追加 */
+        }
+
+        .back-button {
+            border: 1px solid black;
+            background-color: skyblue; /* 戻るボタンはライトブルー */
+            padding: 4px 8px;
+            border-radius: 5px; /* 角を丸くする */
+        }
+
+        .register-button:hover, .back-button:hover {
+            opacity: 0.8; /* ホバー時に透明度を下げる */
+        }
+
+</style>
+@endpush

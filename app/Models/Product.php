@@ -23,7 +23,7 @@ class Product extends Model
     
     public function sales()
     {
-        return $this->hasMany('App\Models\Sale');
+        return $this->hasMany(Sale::class);
     }
     
 }

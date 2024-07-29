@@ -1,15 +1,54 @@
 
+@extends('layouts.app')
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    
-<meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>商品情報詳細</title>
-    
+@section('content')
+    <div class="container">
+        <h2>商品情報詳細画面</h2>
+
+        @if(session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
+        <div class="show-body">
+
+            <div class="show-row">
+                <strong>ID</strong> <span>{{ $product->id }}.</span>
+            </div>
+            <div class="show-row"> 
+                <strong>画像パス</strong> <span><img src="{{ asset($product->img_path) }}" alt="{{ $product->product_name }}" style="max-width: 200px;"></span>
+            </div>
+            <div class="show-row">
+                <strong>商品名</strong> <span>{{ $product->product_name }}</span>
+            </div>
+            <div class="show-row">
+                <strong>メーカー名</strong> <span>{{ $product->company->company_name }}</span>
+            </div>
+            <div class="show-row">
+                <strong>価格</strong> <span>￥{{ $product->price }}</span>
+            </div>
+            <div class="show-row">
+                <strong>在庫数</strong> <span>{{ $product->stock }}</span>
+            </div>
+            <div class="show-row">
+                <strong>コメント</strong> <span>{{ $product->comment }}</span>
+            </div>
+            
+            
+            
+            <div class="show-row">
+                <a href="{{ route('products.edit', $product->id) }}"><button type="submit" class="edit-button">編集</a>
+                <a href="{{ route('products.index') }}"><button type="button" class="return-button">戻る</a>
+            </div>
+        </div>
+    </div>
+
+@endsection
+
+@push('styles') 
+
     <style>
-        .container {
+        body {
             font-size: 20px; /* 文字全体を少し大きくする */
             display: flex;
             flex-direction: column; /* 縦方向に並べる */
@@ -63,45 +102,4 @@
         
 
     </style>
-</head>
-    <div class="container">
-        <h2>商品情報詳細画面</h2>
-
-        @if(session('success'))
-            <div class="alert alert-success">
-                {{ session('success') }}
-            </div>
-        @endif
-        <div class="show-body">
-
-            <div class="show-row">
-                <strong>ID</strong> <span>{{ $product->id }}.</span>
-            </div>
-            <div class="show-row"> 
-                <strong>画像パス</strong> <span><img src="{{ asset($product->img_path) }}" alt="{{ $product->product_name }}" style="max-width: 200px;"></span>
-            </div>
-            <div class="show-row">
-                <strong>商品名</strong> <span>{{ $product->product_name }}</span>
-            </div>
-            <div class="show-row">
-                <strong>メーカー名</strong> <span>{{ $product->company->company_name }}</span>
-            </div>
-            <div class="show-row">
-                <strong>価格</strong> <span>￥{{ $product->price }}</span>
-            </div>
-            <div class="show-row">
-                <strong>在庫数</strong> <span>{{ $product->stock }}</span>
-            </div>
-            <div class="show-row">
-                <strong>コメント</strong> <span>{{ $product->comment }}</span>
-            </div>
-            
-            
-            
-            <div class="show-row">
-                <a href="{{ route('products.edit', $product->id) }}"><button type="submit" class="edit-button">編集</a>
-                <a href="{{ route('products.index') }}"><button type="button" class="return-button">戻る</a>
-            </div>
-        </div>
-    </div>
-
+@endpush

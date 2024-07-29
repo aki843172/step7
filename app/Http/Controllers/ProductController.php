@@ -21,6 +21,13 @@ class ProductController extends Controller
 
         $keyword = $request->input('keyword'); //商品名の値
         $company_id = $request->input('company_id'); //会社名の値
+        $price_min = $request->input('price_min'); // 価格下限
+        $price_max = $request->input('price_max'); // 価格上限
+        $stock_min = $request->input('stock_min'); // 在庫下限
+        $stock_max = $request->input('stock_max'); // 在庫上限
+        $sort = $request->input('sort', 'id');
+        $direction = $request->input('direction', 'desc');
+
 
         $query = Product::query();
        
@@ -32,12 +39,33 @@ class ProductController extends Controller
             $query->where('company_id', $company_id);
         }
 
+        if (isset($price_min)) {
+            $query->where('price', '>=', $price_min);
+        }
+
+        if (isset($price_max)) {
+            $query->where('price', '<=', $price_max);
+        }
+
+        if (isset($stock_min)) {
+            $query->where('stock', '>=', $stock_min);
+        }
+
+        if (isset($stock_max)) {
+            $query->where('stock', '<=', $stock_max);
+        }
+
+
         
-        $products = $query->with('company')->orderBy('id', 'asc')->paginate(10);
+        $products = $query->with('company')->orderBy($sort, $direction)->paginate(10);
+
+        if ($request->ajax()) {
+            return view('products.partials.product_list', compact('products'))->render();
+        }
 
         $companies = Company::pluck('company_name', 'id')->toArray();
 
-        return view('products.index', compact('companies', 'products'));
+        return view('products.index', compact('companies', 'products', 'sort', 'direction'));
          
     }
  
@@ -134,11 +162,6 @@ class ProductController extends Controller
             $product->stock = $request['stock'];
             $product->comment = $request['comment'];
 
-            //if ($request->hasFile('img_path')) {
-                //$file = $request->file('img_path');
-                //$filename = time() . '.' . $file->getClientOriginalExtension();
-                //$file->move(public_path('images'), $filename);
-                //$product->img_path = 'images/' . $filename;
             
             if ($request->has('delete_img') && $product->img_path) {
                 $img_path = public_path($product->img_path);
@@ -185,11 +208,21 @@ class ProductController extends Controller
     public function destroy($id)
     {
         try {
-            $product = Product::find($id);
+            $product = Product::findOrFail($id);
             $product->delete();
+    
+            if (request()->ajax()) {
+                return response()->json(['success' => true]);
+            }
+    
             return redirect()->route('products.index')->with('success', '商品を削除しました。');
         } catch (Exception $e) {
+            if (request()->ajax()) {
+                return response()->json(['error' => '商品の削除中にエラーが発生しました。'], 500);
+            }
+    
             return redirect()->route('products.index')->with('error', '商品の削除中にエラーが発生しました。');
         }
     }
+ 
 }
