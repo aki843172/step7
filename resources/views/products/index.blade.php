@@ -3,7 +3,7 @@
 @section('content')
     <div class="container">
         <h2>商品一覧画面</h2>
-        <form  id="searchForm">
+        <form  id="searchForm"  action="{{ route('products.index') }}">
             <input type="text" name="keyword" placeholder="検索キーワード" value="{{ request('keyword') }}" class="search-input">
             <select name="company_id" class="select-box">
                 <option value="">メーカー名</option>
@@ -13,21 +13,21 @@
                     </option>
                 @endforeach
             </select>
-            <input type="number" name="price_min" placeholder="価格下限" class="search-input">
-            <input type="number" name="price_max" placeholder="価格上限" class="search-input">
-            <input type="number" name="stock_min" placeholder="在庫下限" class="search-input">
-            <input type="number" name="stock_max" placeholder="在庫上限" class="search-input">
+            <input type="number" name="price_min" placeholder="価格下限" class="search-input" value="{{ request('price_min') }}">
+            <input type="number" name="price_max" placeholder="価格上限" class="search-input" value="{{ request('price_max') }}">
+            <input type="number" name="stock_min" placeholder="在庫下限" class="search-input" value="{{ request('stock_min') }}">
+            <input type="number" name="stock_max" placeholder="在庫上限" class="search-input" value="{{ request('stock_max') }}">
             <button type="submit" class="search-button">検索</button>
            
         </form>
         <table class="table">
             <thead>
                 <tr>
-                    <th><a href="{{ route('products.index', array_merge(request()->all(), ['sort' => 'id', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}">ID</a></th>
-                    <th>商品名</a></th>
+                    <th><a href="#" class="sort-link" data-sort="id">ID</a></th>
+                    <th>商品名</th>
                     <th>商品画像</th>
-                    <th><a href="{{ route('products.index', array_merge(request()->all(), ['sort' => 'price', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}">価格</a></th>
-                    <th><a href="{{ route('products.index', array_merge(request()->all(), ['sort' => 'stock', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}">在庫数</a></th>
+                    <th><a href="#" class="sort-link" data-sort="price">価格</a></th>
+                    <th><a href="#" class="sort-link" data-sort="stock">在庫数</a></th>
                     <th>メーカー名</th>
                     <th><a href="{{ route('products.create') }}"><button type="submit" class="register-button">新規登録</button></a></th>
                 </tr>
@@ -36,51 +36,99 @@
             @include('products.partials.product_list', ['products' => $products])
             </tbody>
         </table>
-        {{ $products->links() }}
+        {{ $products->appends(request()->all())->links() }}
+
+        
     </div>
 @endsection
 
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.31.3/js/jquery.tablesorter.min.js"></script>
 <script>
     $(document).ready(function() {
-        // 検索フォームの非同期処理
+        var currentSort = "{{ request('sort','id') }}";
+        var currentDirection = "{{ request('direction','desc') }}";
+
         $('#searchForm').on('submit', function(event) {
             event.preventDefault();
-            $.ajax({
-                url: "{{ route('products.index') }}",
-                method: "GET",
-                data: $(this).serialize(),
-                success: function(response) {
-                    $('#product-list').html(response);
-                },
-                error: function(xhr) {
-                    alert('検索に失敗しました。');
-                }
-            });
+            performSearch();
         });
 
-        // 削除ボタンの非同期処理
-        $(document).on('submit', '.delete-form', function(event) {
+        $(document).on('click', '.sort-link', function(event) {
+            event.preventDefault();
+            var sort = $(this).data('sort');
+            if (currentSort === sort) {
+                currentDirection = currentDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSort = sort;
+                currentDirection = 'asc';
+            }
+            performSearch();
+        });
+
+        $(document).on('click', '.delete-button', function(event) {
             event.preventDefault();
             if (!confirm('本当にこの商品を削除しますか？')) {
                 return;
             }
-            var form = $(this);
+            var $row = $(this).closest('tr');
+            var deleteUrl = $(this).data('url');
             $.ajax({
-                url: form.attr('action'),
-                method: form.find('input[name="_method"]').val(),
-                data: form.serialize(),
+                url: deleteUrl,
+                method: 'DELETE',
+                data: {
+                    _token: '{{ csrf_token() }}'
+                },
                 success: function(response) {
-                    form.closest('tr').remove();
+                    $row.remove();
                 },
                 error: function(xhr) {
                     alert('削除に失敗しました。');
                 }
             });
         });
+
+        function performSearch() {
+        var formData = $('#searchForm').serializeArray();
+        formData.push({ name: 'sort', value: currentSort });
+        formData.push({ name: 'direction', value: currentDirection });
+
+        $.ajax({
+            url: "{{ route('products.index') }}",
+            method: "GET",
+            data: $.param(formData),
+            success: function(response) {
+                $('#product-list').html(response);
+                $(".table").tablesorter({
+                    headers: {
+                        0: { sorter: 'digit' }, // ID カラムのソート
+                        3: { sorter: 'digit' }, // 価格カラムのソート
+                        4: { sorter: 'digit' }  // 在庫数カラムのソート
+                    },
+                    sortList: [[0,1]] // 初期ソート: ID 降順
+                });
+            },
+            error: function(xhr) {
+                alert('検索に失敗しました。');
+            }
+        });
+    }
+
+
+        $(".table").tablesorter({
+            headers: {
+                0: { sorter: 'digit' }, // ID カラムのソート
+                3: { sorter: 'digit' }, // 価格カラムのソート
+                4: { sorter: 'digit' }  // 在庫数カラムのソート
+            },
+            sortList: [[0,1]] // 初期
+        });
     });
+
+    
 </script>
+
 
 @push('styles')
 <style>

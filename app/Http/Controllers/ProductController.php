@@ -28,6 +28,14 @@ class ProductController extends Controller
         $sort = $request->input('sort', 'id');
         $direction = $request->input('direction', 'desc');
 
+        if (!in_array($direction, ['asc', 'desc'])) {
+            $direction = 'desc';
+        }
+    
+        $validSortColumns = ['id', 'price', 'stock']; // 有効なソートカラムを定義
+        if (!in_array($sort, $validSortColumns)) {
+            $sort = 'id'; // 無効な場合はデフォルトのソートカラムに戻す
+        }
 
         $query = Product::query();
        
